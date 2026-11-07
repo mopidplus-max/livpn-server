@@ -14,6 +14,39 @@ import service
 log = logging.getLogger("livpn")
 
 
+def _run_bot_forever() -> None:
+    """Держим бота живым: 409 при пересечении рестартов не должен ронять веб."""
+    from telebot.apihelper import ApiTelegramException
+
+    from bot import run_bot
+
+    delay = 5
+    while True:
+        started = time.monotonic()
+        try:
+            run_bot()
+            log.warning("Telegram-бот остановился, перезапуск через %d сек", delay)
+        except KeyboardInterrupt:
+            raise
+        except ApiTelegramException as exc:
+            if getattr(exc, "error_code", 0) == 409:
+                # Старый контейнер ещё опрашивает Telegram во время рестарта.
+                log.warning(
+                    "Telegram: getUpdates занят другим экземпляром (409). "
+                    "Повтор через %d сек",
+                    delay,
+                )
+            else:
+                log.exception("Ошибка Telegram API, повтор через %d сек", delay)
+        except Exception:
+            log.exception("Telegram-бот упал, повтор через %d сек", delay)
+        if time.monotonic() - started > 60:
+            delay = 5
+        else:
+            delay = min(delay * 2, 60)
+        time.sleep(delay)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="LiVPN")
     parser.add_argument("--web-only", action="store_true", help="только Flask")
@@ -65,12 +98,21 @@ def main() -> None:
     try:
         if args.web_only:
             log.info("Запущен режим только веб-сервера")
-            while True:
-                time.sleep(3600)
+        elif args.bot_only:
+            log.info("Запущен режим только Telegram-бота")
+            _run_bot_forever()
+            return
         else:
-            from bot import run_bot
-
-            run_bot()
+            # Бот работает в фоновом потоке: его сбой (например, 409 при
+            # пересечении рестартов) больше не убивает веб-сервер.
+            threading.Thread(
+                target=_run_bot_forever,
+                name="livpn-bot",
+                daemon=True,
+            ).start()
+            log.info("Запущены веб-сервер и Telegram-бот")
+        while True:
+            time.sleep(3600)
     except KeyboardInterrupt:
         log.info("Остановка…")
     finally:
