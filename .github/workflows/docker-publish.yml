@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE: ghcr.io/mopidplus-max/livpn
+  IMAGE: ghcr.io/mopidplus-max/livpn-server
 
 jobs:
   build:
