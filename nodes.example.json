@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    {
+      "uri": "vless://00000000-0000-0000-0000-000000000001@example.com:443?type=tcp&security=reality&pbk=REPLACE_ME&fp=chrome&sni=example.com&sid=0123&flow=xtls-rprx-vision",
+      "name": "🇪🇺💎 Авто | Самый быстрый ⚡️⚡️⚡️"
+    },
+    {
+      "uri": "vless://00000000-0000-0000-0000-000000000002@example.org:443?type=tcp&security=tls&sni=example.org&fp=chrome",
+      "name": "🇳🇱 Нидерланды 1 ⚡"
+    },
+    {
+      "uri": "vless://00000000-0000-0000-0000-000000000003@example.net:443?type=tcp&security=reality&pbk=REPLACE_ME&fp=chrome&sni=example.net&sid=4567",
+      "name": "🇫🇮 Финляндия LTE обход"
+    }
+  ],
+  "traffic": {
+    "upload": 0,
+    "download": 0,
+    "total": 0
+  }
+}

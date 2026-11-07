@@ -1,0 +1,25 @@
+LiVPN + Remnawave
+=================
+
+1. В .env укажите:
+
+PROVIDER=remnawave
+UPSTREAM_URL=https://ВАШ-ДОМЕН-ПОДПИСКИ/SHORT-UUID
+
+UPSTREAM_URL — публичная subscription-ссылка пользователя Remnawave,
+а не адрес админ-панели и не /api endpoint.
+
+2. Перезапустите LiVPN.
+
+3. Поддерживаются любые варианты ответа Remnawave:
+- XRAY_JSON: конфиг Xray (или массив конфигов) с proxy-outbound'ами;
+- XRAY_BASE64: base64 со списком share-ссылок;
+- обычный текст: одна ссылка vless:// / trojan:// / vmess:// на строку.
+
+Из JSON-конфигов LiVPN собирает ссылки для протоколов VLESS и Trojan.
+VMess/Shadowsocks в JSON пока не поддерживаются.
+
+Если приходит HTML, проверьте URL и Subscription Response Rules в панели.
+Если ответ пустой или 403, проверьте состояние подписки и ограничения HWID.
+
+Важно: не публикуйте subscription URL — он содержит секретный идентификатор доступа.

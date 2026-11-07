@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}{{ name }} — кабинет LiVPN{% endblock %}
+{% block description %}Личный кабинет LiVPN: трафик, серверы, QR-коды и автообновление подписки.{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow, noarchive">{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+{% block nav %}
+  <a href="#servers">Серверы</a>
+  <a href="#help">Помощь</a>
+  <a href="/">Главная</a>
+{% endblock %}
+{% block content %}
+
+<section class="dash-head">
+  <div class="dash-title-wrap">
+    <span class="eyebrow"><span class="status-dot ok"></span> Подписка активна</span>
+    <h1 class="dash-title">{{ name }}</h1>
+    <p class="dash-sub">
+      Обновлено {{ last_refresh_text }} · следующее автообновление
+      <span data-countdown="{{ next_refresh_seconds }}">—</span>
+    </p>
+  </div>
+  <div class="dash-actions">
+    <button class="btn btn--ghost" type="button" data-copy="{{ sub_url }}" data-copy-label="Ссылка скопирована">
+      <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+      <span>Копировать</span>
+    </button>
+    <button class="btn btn--ghost" type="button" data-share="{{ sub_url }}" data-share-title="{{ name }}">
+      <svg class="icon" aria-hidden="true"><use href="#i-share"></use></svg>
+      <span class="hide-sm">Поделиться</span>
+    </button>
+    <button class="btn btn--primary" type="button" data-action="refresh" data-token="{{ token }}"
+            data-cooldown="{{ cooldown_left }}">
+      <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+      <span>Обновить</span>
+    </button>
+  </div>
+</section>
+
+<section class="dash-grid">
+  <article class="card sub-card reveal">
+    <div class="card-head">
+      <h2>Ваша подписка</h2>
+      <span class="badge badge--ok"><span class="status-dot ok"></span> {{ node_count }} серверов</span>
+    </div>
+
+    <div class="url-row">
+      <code class="url" title="{{ sub_url }}">{{ sub_url }}</code>
+      <button class="icon-btn" type="button" data-copy="{{ sub_url }}" data-copy-label="Ссылка скопирована" aria-label="Скопировать ссылку подписки">
+        <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+      </button>
+    </div>
+
+    <div class="qr-inline">
+      <a class="qr-thumb" href="{{ url_for('qr_sub', token=token) }}" data-qr="{{ url_for('qr_sub', token=token) }}"
+         data-qr-title="Подписка LiVPN" aria-label="Открыть QR-код подписки">
+        <img src="{{ url_for('qr_sub', token=token) }}" alt="QR-код подписки LiVPN" width="132" height="132" loading="lazy">
+      </a>
+      <div class="qr-copy">
+        <h3>Подключение в один скан</h3>
+        <p>Откройте Happ, Incy или v2rayNG → «Добавить подписку» → «Сканировать QR».</p>
+        <button class="btn btn--soft btn--sm" type="button" data-qr="{{ url_for('qr_sub', token=token) }}" data-qr-title="Подписка LiVPN">
+          <svg class="icon" aria-hidden="true"><use href="#i-qr"></use></svg>
+          Увеличить QR
+        </button>
+      </div>
+    </div>
+
+    <div class="app-row">
+      <a class="app-chip" href="happ://add/{{ sub_url }}">
+        <span class="app-dot app-dot--blue"></span> Happ
+        <svg class="icon icon-xs" aria-hidden="true"><use href="#i-external"></use></svg>
+      </a>
+      <a class="app-chip" href="hiddify://import/{{ sub_url }}">
+        <span class="app-dot app-dot--green"></span> Hiddify
+        <svg class="icon icon-xs" aria-hidden="true"><use href="#i-external"></use></svg>
+      </a>
+      <button class="app-chip" type="button" data-copy="{{ sub_url }}" data-copy-label="Ссылка скопирована">
+        <svg class="icon icon-xs" aria-hidden="true"><use href="#i-copy"></use></svg> Другой клиент
+      </button>
+    </div>
+
+    <p class="muted-note">
+      <svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+      Ссылка личная: не публикуйте её. При обновлении она не меняется.
+    </p>
+  </article>
+
+  <article class="card traffic-card reveal">
+    <div class="card-head">
+      <h2>Трафик</h2>
+      <span class="badge">{{ "Лимит" if traffic.limited else "Безлимит" }}</span>
+    </div>
+
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Использовано {{ traffic.used_text }}">
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5b8cff"></stop>
+            <stop offset="55%" stop-color="#9b6bff"></stop>
+            <stop offset="100%" stop-color="#22d3ee"></stop>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" cx="60" cy="60" r="52" style="--p: {{ traffic.percent }}"></circle>
+      </svg>
+      <div class="ring-center">
+        <strong>{{ traffic.used_text }}</strong>
+        <span>{% if traffic.limited %}из {{ traffic.total_text }}{% else %}безлимит{% endif %}</span>
+      </div>
+    </div>
+
+    <dl class="mini-stats">
+      <div>
+        <dt><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg> Скачано</dt>
+        <dd>{{ traffic.download_text }}</dd>
+      </div>
+      <div>
+        <dt><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg> Отправлено</dt>
+        <dd>{{ traffic.upload_text }}</dd>
+      </div>
+      <div>
+        <dt><svg class="icon" aria-hidden="true"><use href="#i-server"></use></svg> Серверов</dt>
+        <dd>{{ node_count }}</dd>
+      </div>
+      <div>
+        <dt><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg> Стран</dt>
+        <dd>{{ country_count }}</dd>
+      </div>
+    </dl>
+
+    <p class="muted-note">
+      <svg class="icon" aria-hidden="true"><use href="#i-infinity"></use></svg>
+      Срок действия не ограничен, трафик не сбрасывается при обновлении.
+    </p>
+  </article>
+</section>
+
+<section class="section nodes-section" id="servers">
+  <div class="section-head section-head--row">
+    <div>
+      <span class="eyebrow">Серверы</span>
+      <h2>Выберите страну и транспорт</h2>
+      <p>У каждой страны три варианта: TCP, gRPC и XHTTP. Если один медленный — попробуйте другой.</p>
+    </div>
+    <label class="search">
+      <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+      <span class="sr-only">Поиск по серверам</span>
+      <input id="node-search" type="search" placeholder="Страна, хост или транспорт" autocomplete="off" spellcheck="false">
+    </label>
+  </div>
+
+  <div class="filters" role="group" aria-label="Фильтр по транспорту">
+    <button class="chip is-active" type="button" data-filter="all">Все <span>{{ node_count }}</span></button>
+    <button class="chip" type="button" data-filter="tcp">TCP</button>
+    <button class="chip" type="button" data-filter="grpc">gRPC</button>
+    <button class="chip" type="button" data-filter="xhttp">XHTTP</button>
+    <button class="chip" type="button" data-filter="auto">Авто</button>
+  </div>
+  <p class="filter-count" id="filter-count" aria-live="polite">Показано {{ node_count }} из {{ node_count }}</p>
+
+  {% if nodes %}
+  <div class="node-grid" id="node-grid">
+    {% for n in nodes %}
+    <article class="node-card reveal" data-search="{{ n.search }}" data-transport="{{ n.filter }}" style="--i: {{ loop.index0 }}">
+      <div class="node-top">
+        <span class="node-flag" aria-hidden="true">{{ n.flag }}</span>
+        <div class="node-title">
+          <h3>{{ n.short }}</h3>
+          <p title="{{ n.endpoint }}">{{ n.endpoint }}</p>
+        </div>
+        {% if n.is_auto %}
+        <span class="transport transport--auto">Авто</span>
+        {% elif n.transport %}
+        <span class="transport transport--{{ n.transport|lower }}">{{ n.transport }}</span>
+        {% endif %}
+      </div>
+      <div class="node-foot">
+        <span class="protocol">{{ n.protocol or "node" }}</span>
+        <div class="node-actions">
+          <button class="icon-btn" type="button"
+                  data-qr="{{ url_for('qr_node', token=token, idx=n.idx) }}"
+                  data-qr-title="{{ n.short }}"
+                  aria-label="QR-код сервера {{ n.short }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-qr"></use></svg>
+          </button>
+          <button class="icon-btn" type="button" data-copy="{{ n.uri }}"
+                  data-copy-label="Сервер скопирован"
+                  aria-label="Скопировать сервер {{ n.short }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+          </button>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="empty" id="node-empty" hidden>
+    <span class="empty-icon"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></span>
+    <h3>Ничего не найдено</h3>
+    <p>Попробуйте другое название страны, хоста или транспорта.</p>
+    <button class="btn btn--soft btn--sm" type="button" id="reset-filter">Сбросить фильтры</button>
+  </div>
+  {% else %}
+  <div class="empty">
+    <span class="empty-icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg></span>
+    <h3>Серверы готовятся</h3>
+    <p>Подписка создаётся впервые. Обновите страницу через минуту — список появится автоматически.</p>
+    <button class="btn btn--primary btn--sm" type="button" data-action="refresh" data-token="{{ token }}">
+      <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+      Попробовать сейчас
+    </button>
+  </div>
+  {% endif %}
+</section>
+
+<section class="help-strip" id="help">
+  <div class="help-card reveal">
+    <div class="help-copy">
+      <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-wand"></use></svg> Помощь</span>
+      <h2>Нужна инструкция?</h2>
+      <p>Пошаговые подсказки для Happ, Incy, v2rayNG и Hiddify есть в боте. Если сервер не отвечает — напишите в поддержку.</p>
+    </div>
+    <div class="help-actions">
+      {% if bot_url %}
+      <a class="btn btn--primary" href="{{ bot_url }}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+        Открыть бота
+      </a>
+      {% endif %}
+      {% if support_url %}
+      <a class="btn btn--ghost" href="{{ support_url }}" target="_blank" rel="noopener">
+        Поддержка
+        <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg>
+      </a>
+      {% endif %}
+      {% if channel_url %}
+      <a class="btn btn--ghost" href="{{ channel_url }}" target="_blank" rel="noopener">Канал</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<dialog class="qr-dialog" id="qr-dialog" aria-labelledby="qr-title">
+  <div class="qr-dialog-head">
+    <h3 id="qr-title">QR-код</h3>
+    <button class="icon-btn" type="button" data-close-dialog aria-label="Закрыть">
+      <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+  <div class="qr-frame qr-frame--big">
+    <img id="qr-image" src="" alt="QR-код" width="280" height="280">
+  </div>
+  <p class="qr-caption">Наведите камеру клиента или сканер QR-кода.</p>
+</dialog>
+
+{% endblock %}

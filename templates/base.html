@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <title>{% block title %}{{ cfg.WEB_TITLE }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}LiVPN — бесплатные подписки Xray для Happ, Incy, v2rayNG и Hiddify. Девять стран, три транспорта, QR-коды и автообновление.{% endblock %}">
+  {% block robots %}{% endblock %}
+  <meta name="theme-color" content="#070b14" id="meta-theme">
+  <meta name="application-name" content="{{ cfg.WEB_TITLE }}">
+  <link rel="icon" href="{{ url_for('static', filename='logo.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.svg') }}">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script nonce="{{ csp_nonce }}">
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      var theme = '';
+      try { theme = localStorage.getItem('livpn-theme') || ''; } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light' : 'dark';
+      }
+      root.dataset.theme = theme;
+    })();
+  </script>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main">К содержимому</a>
+
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="i-telegram" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-4.9 9-8.1c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5l19-7.3c.9-.3 1.6.2 1.3 1.5z"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M15 5.5A2.5 2.5 0 0 0 12.5 3h-7A2.5 2.5 0 0 0 3 5.5v7A2.5 2.5 0 0 0 5.5 15"/></symbol>
+      <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20.5 14v3M17 20.5h3.5M14 20.5h.01"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.8 6.8-4M8.6 13.2l6.8 4"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2z"/></symbol>
+      <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M4 17.5V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.5 12.5 4.5 4.5L19.5 6.5"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 3.9 5.7 3.9 9s-1.3 6.3-3.9 9c-2.6-2.7-3.9-5.7-3.9-9S9.4 5.7 12 3z"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.6c0 4.3 3.1 7.9 7.5 9.4 4.4-1.5 7.5-5.1 7.5-9.4V6L12 3z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+      <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></symbol>
+      <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
+      <symbol id="i-infinity" viewBox="0 0 24 24"><path d="M8.3 8.3c2.2 0 3.7 3.7 3.7 3.7s1.5 3.7 3.7 3.7a3.7 3.7 0 0 0 0-7.4c-2.2 0-3.7 3.7-3.7 3.7s-1.5 3.7-3.7 3.7a3.7 3.7 0 0 1 0-7.4z"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4.5"/><path d="m11.2 11.2 8.3 8.3M16 16l2-2M18.5 18.5l2-2"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+      <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13.8a4.2 4.2 0 0 0 6 0l2.6-2.6a4.2 4.2 0 0 0-6-6L11.3 6.5"/><path d="M14 10.2a4.2 4.2 0 0 0-6 0l-2.6 2.6a4.2 4.2 0 0 0 6 6l1.3-1.3"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></symbol>
+      <symbol id="i-wand" viewBox="0 0 24 24"><path d="m4 20 11-11"/><path d="M14 4l.8 2.2L17 7l-2.2.8L14 10l-.8-2.2L11 7l2.2-.8L14 4zM20 12l.5 1.5L22 14l-1.5.5L20 16l-.5-1.5L18 14l1.5-.5L20 12z"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="{{ cfg.WEB_TITLE }} — на главную">
+        <span class="brand-mark"><img src="{{ url_for('static', filename='logo.svg') }}" alt="" width="36" height="36"></span>
+        <span class="brand-text">LiVPN<span class="brand-dot">.</span></span>
+      </a>
+      <nav class="nav" aria-label="Основная навигация">
+        {% block nav %}{% endblock %}
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn install-btn" id="install-btn" type="button" title="Установить приложение" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-install"></use></svg>
+          <span class="sr-only">Установить приложение</span>
+        </button>
+        <button class="icon-btn theme-btn" id="theme-toggle" type="button" aria-label="Сменить тему" title="Сменить тему">
+          <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"></use></svg>
+          <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"></use></svg>
+        </button>
+        {% if bot_url %}
+        <a class="btn btn--primary btn--sm header-cta" href="{{ bot_url }}" target="_blank" rel="noopener">
+          <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+          <span>Открыть бота</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="{% block main_class %}container page{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a class="brand brand--small" href="/">
+          <span class="brand-mark"><img src="{{ url_for('static', filename='logo.svg') }}" alt="" width="28" height="28"></span>
+          <span class="brand-text">LiVPN<span class="brand-dot">.</span></span>
+        </a>
+        <p>Бесплатные подписки Xray. Без регистрации и лимита по времени.</p>
+      </div>
+      <div class="footer-links">
+        {% if channel_url %}<a href="{{ channel_url }}" target="_blank" rel="noopener">Telegram-канал</a>{% endif %}
+        {% if support_url %}<a href="{{ support_url }}" target="_blank" rel="noopener">Поддержка</a>{% endif %}
+        <a href="/">Главная</a>
+      </div>
+      <div class="footer-meta">
+        <span>© {{ year }} {{ cfg.WEB_TITLE }}</span>
+        <span class="dot-sep" aria-hidden="true"></span>
+        <span>Автообновление каждые {{ update_interval }} ч</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-stack" id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

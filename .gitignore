@@ -1,0 +1,15 @@
+account.json
+account.json.tmp
+.env
+livpn.db
+livpn.db-*
+livpn.db-wal
+livpn.db-shm
+livpn.db.bak-*
+base_url.txt
+__pycache__/
+*.pyc
+*.bak-*
+livpn.zip
+
+bot_username.txt

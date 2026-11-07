@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% block title %}LiVPN — бесплатный VPN для Happ, Incy и v2rayNG{% endblock %}
+{% block nav %}
+  <a href="#features">Возможности</a>
+  <a href="#how">Как подключить</a>
+  <a href="#faq">Вопросы</a>
+{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-copy reveal">
+    <span class="eyebrow"><span class="pulse-dot"></span> Бесплатно · Без регистрации</span>
+    <h1>Интернет <span class="grad-text">без границ</span><br>на любой скорости</h1>
+    <p class="lead">
+      LiVPN собирает быстрые серверы Xray в одну подписку. Девять стран,
+      три транспорта, QR-код и автоматическое обновление каждые
+      {{ update_interval }} часов.
+    </p>
+    <div class="hero-actions">
+      {% if bot_url %}
+      <a class="btn btn--primary btn--lg" href="{{ bot_url }}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+        Подключить в Telegram
+        <svg class="icon icon-arrow" aria-hidden="true"><use href="#i-arrow"></use></svg>
+      </a>
+      {% else %}
+      <a class="btn btn--primary btn--lg" href="{{ channel_url }}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+        Получить подписку
+      </a>
+      {% endif %}
+      <button class="btn btn--ghost btn--lg" type="button" data-scroll="#cabinet">
+        <svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg>
+        У меня есть ссылка
+      </button>
+    </div>
+
+    <form class="open-form" id="open-sub-form" action="/" method="get" novalidate>
+      <label class="sr-only" for="sub-link">Ссылка подписки или токен</label>
+      <span class="open-form-icon"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></span>
+      <input id="sub-link" name="link" type="text" inputmode="url" autocomplete="off"
+             placeholder="Вставьте ссылку подписки или токен" spellcheck="false">
+      <button class="btn btn--soft" type="submit">Открыть кабинет</button>
+    </form>
+    <p class="hero-hint">Ссылка вида <code>…/sub/&lt;токен&gt;</code> или просто токен.</p>
+
+    <ul class="hero-points">
+      <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Без лимита по времени</li>
+      <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Трафик не сбрасывается</li>
+      <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Ссылка не меняется</li>
+    </ul>
+  </div>
+
+  <div class="hero-visual reveal" aria-hidden="true">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="mini-head">
+          <span class="mini-brand"><img src="{{ url_for('static', filename='logo.svg') }}" alt="" width="26" height="26"> LiVPN</span>
+          <span class="mini-pill"><span class="status-dot ok"></span> Активна</span>
+        </div>
+        <div class="mini-traffic">
+          <div class="mini-ring">
+            <svg viewBox="0 0 90 90" role="presentation">
+              <circle class="mini-ring-bg" cx="45" cy="45" r="36"></circle>
+              <circle class="mini-ring-fg" cx="45" cy="45" r="36"></circle>
+            </svg>
+            <span>21.5<span>MB</span></span>
+          </div>
+          <div class="mini-traffic-text">
+            <strong>Трафик</strong>
+            <span>безлимит</span>
+            <em>28 серверов</em>
+          </div>
+        </div>
+        <div class="mini-nodes">
+          <div class="mini-node"><span class="mini-flag">🇪🇸</span><span>Испания</span><em>gRPC</em><i class="mini-ok"></i></div>
+          <div class="mini-node"><span class="mini-flag">🇩🇪</span><span>Германия</span><em>XHTTP</em><i class="mini-ok"></i></div>
+          <div class="mini-node"><span class="mini-flag">🇳🇱</span><span>Нидерланды</span><em>TCP</em><i class="mini-ok"></i></div>
+          <div class="mini-node"><span class="mini-flag">🇺🇸</span><span>США</span><em>gRPC</em><i class="mini-ok"></i></div>
+        </div>
+        <div class="mini-qr">
+          <span class="mini-qr-box"></span>
+          <div><strong>Подключение</strong><span>Сканируйте QR</span></div>
+        </div>
+      </div>
+    </div>
+    <span class="float-chip chip-a"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg> Без логов</span>
+    <span class="float-chip chip-b"><svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg> Автоподбор</span>
+    <span class="float-chip chip-c"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg> 9 стран</span>
+  </div>
+</section>
+
+<section class="stats-strip reveal" aria-label="Статистика сервиса">
+  <div class="stat-card">
+    <span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg></span>
+    <strong data-count="{{ stats.users }}">{{ stats.users }}</strong>
+    <span>Пользователей</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg></span>
+    <strong data-count="{{ stats.subs }}">{{ stats.subs }}</strong>
+    <span>Подписок</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-server"></use></svg></span>
+    <strong data-count="{{ stats.nodes }}">{{ stats.nodes }}</strong>
+    <span>Серверов</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg></span>
+    <strong data-count="{{ stats.countries }}">{{ stats.countries }}</strong>
+    <span>Стран</span>
+  </div>
+</section>
+
+<section class="flags-strip reveal" aria-label="Доступные страны">
+  <span class="flags-label">Серверы в:</span>
+  <div class="flags">
+    <span>🇪🇸 Испания</span><span>🇩🇪 Германия</span><span>🇧🇬 Болгария</span>
+    <span>🇺🇸 США</span><span>🇨🇦 Канада</span><span>🇳🇱 Нидерланды</span>
+    <span>🇵🇱 Польша</span><span>🇫🇮 Финляндия</span><span>🇨🇭 Швейцария</span>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-head reveal">
+    <span class="eyebrow">Возможности</span>
+    <h2>Всё, что нужно для быстрого VPN</h2>
+    <p>Мы убрали лишние шаги: подписка создаётся в боте, а кабинет показывает её состояние и QR-коды.</p>
+  </div>
+  <div class="feature-grid">
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-blue"><svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg></span>
+      <h3>Мгновенная выдача</h3>
+      <p>Ссылка и QR-код появляются сразу после нажатия «Подключить». Без ожидания и ручной настройки.</p>
+    </article>
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-violet"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg></span>
+      <h3>Девять стран</h3>
+      <p>Испания, Германия, Болгария, США, Канада, Нидерланды, Польша, Финляндия и Швейцария.</p>
+    </article>
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-cyan"><svg class="icon" aria-hidden="true"><use href="#i-server"></use></svg></span>
+      <h3>Три транспорта</h3>
+      <p>TCP, gRPC и XHTTP для каждой страны. Выбирайте тот, что стабильнее у вашего оператора.</p>
+    </article>
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-green"><svg class="icon" aria-hidden="true"><use href="#i-qr"></use></svg></span>
+      <h3>QR-коды</h3>
+      <p>Один скан — и подписка уже в Happ, Incy, v2rayNG или Hiddify. QR есть и для каждого сервера.</p>
+    </article>
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-amber"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg></span>
+      <h3>Автообновление</h3>
+      <p>Серверы обновляются каждые {{ update_interval }} часов. Ссылка остаётся прежней, трафик не сбрасывается.</p>
+    </article>
+    <article class="feature-card reveal">
+      <span class="feature-icon icon-rose"><svg class="icon" aria-hidden="true"><use href="#i-infinity"></use></svg></span>
+      <h3>Без срока действия</h3>
+      <p>Подписка не истекает: никаких счётчиков дней, продлений и скрытых условий.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="section-head reveal">
+    <span class="eyebrow">Как подключить</span>
+    <h2>Три шага до интернета</h2>
+    <p>Никаких аккаунтов, почты и паролей. Всё держится на вашей личной ссылке.</p>
+  </div>
+  <ol class="steps">
+    <li class="step reveal">
+      <span class="step-num">01</span>
+      <div>
+        <h3>Откройте бота</h3>
+        <p>Нажмите «Подключить VPN» в Telegram. Бот проверит подписку на канал и соберёт вашу ссылку.</p>
+      </div>
+    </li>
+    <li class="step reveal">
+      <span class="step-num">02</span>
+      <div>
+        <h3>Добавьте подписку</h3>
+        <p>В Happ: «Добавить подписку» → вставьте ссылку → «Импорт». В Incy, v2rayNG и Hiddify — так же.</p>
+      </div>
+    </li>
+    <li class="step reveal">
+      <span class="step-num">03</span>
+      <div>
+        <h3>Выберите сервер</h3>
+        <p>Откройте кабинет, сравните страны и транспорты, нажмите «Подключить». Всё готово.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="clients reveal">
+    <span class="clients-label">Работает с</span>
+    <div class="client-chips">
+      <span class="client-chip">Happ</span>
+      <span class="client-chip">Incy</span>
+      <span class="client-chip">v2rayNG</span>
+      <span class="client-chip">Hiddify</span>
+      <span class="client-chip">Streisand</span>
+      <span class="client-chip">V2Box</span>
+    </div>
+  </div>
+</section>
+
+<section class="section cabinet-section" id="cabinet">
+  <div class="cabinet-card reveal">
+    <div class="cabinet-copy">
+      <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg> Личный кабинет</span>
+      <h2>Ваша подписка — в одном месте</h2>
+      <p>
+        Вставьте ссылку из бота, чтобы увидеть трафик, список серверов, QR-коды
+        и время следующего обновления. Ссылка нигде не публикуется и не
+        индексируется поисковиками.
+      </p>
+      <form class="open-form open-form--wide" id="open-sub-form-2" action="/" method="get" novalidate>
+        <label class="sr-only" for="sub-link-2">Ссылка подписки или токен</label>
+        <span class="open-form-icon"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></span>
+        <input id="sub-link-2" name="link" type="text" inputmode="url" autocomplete="off"
+               placeholder="https://…/sub/токен" spellcheck="false">
+        <button class="btn btn--primary" type="submit">Открыть</button>
+      </form>
+      <p class="cabinet-note">
+        <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+        Не передавайте ссылку другим: она даёт доступ к вашей подписке.
+      </p>
+    </div>
+    <div class="cabinet-preview" aria-hidden="true">
+      <div class="preview-window">
+        <div class="preview-bar"><span></span><span></span><span></span><em>LiVPN · кабинет</em></div>
+        <div class="preview-body">
+          <div class="preview-row">
+            <span class="preview-pill"><span class="status-dot ok"></span> Подписка активна</span>
+            <span class="preview-badge">28 серверов</span>
+          </div>
+          <div class="preview-url">
+            <code>https://…/sub/••••••••</code>
+            <span><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg></span>
+          </div>
+          <div class="preview-grid">
+            <div class="preview-node"><span>🇪🇸</span><div><strong>Испания</strong><em>gRPC</em></div><i class="mini-ok"></i></div>
+            <div class="preview-node"><span>🇩🇪</span><div><strong>Германия</strong><em>XHTTP</em></div><i class="mini-ok"></i></div>
+            <div class="preview-node"><span>🇨🇭</span><div><strong>Швейцария</strong><em>TCP</em></div><i class="mini-ok"></i></div>
+            <div class="preview-node"><span>🇫🇮</span><div><strong>Финляндия</strong><em>gRPC</em></div><i class="mini-ok"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="section-head reveal">
+    <span class="eyebrow">Вопросы</span>
+    <h2>Коротко о главном</h2>
+  </div>
+  <div class="faq reveal">
+    <details open>
+      <summary>Это действительно бесплатно?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>Да. LiVPN не берёт денег и не просит привязать карту. Подписка живёт, пока работает сервис.</p>
+    </details>
+    <details>
+      <summary>Нужна регистрация?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>Нет. Достаточно Telegram-аккаунта, чтобы получить личную ссылку в боте. Почта и пароль не нужны.</p>
+    </details>
+    <details>
+      <summary>Какие клиенты подходят?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>Happ, Incy, v2rayNG, Hiddify, Streisand, V2Box и другие клиенты с поддержкой Xray-подписок.</p>
+    </details>
+    <details>
+      <summary>Подписка перестанет работать?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>Срок действия не ограничен. Серверы обновляются автоматически, ссылка остаётся той же. Если сервер временно недоступен — выберите другой в кабинете.</p>
+    </details>
+    <details>
+      <summary>Где взять ссылку?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>В Telegram-боте после нажатия «Подключить VPN». Она также показывается в кабинете вместе с QR-кодом.</p>
+    </details>
+    <details>
+      <summary>Почему в названии сервера есть TCP, gRPC или XHTTP?<svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+      <p>Это транспорт. У одной страны их три — если один работает нестабильно, попробуйте другой. Название страны и флаг остаются прежними.</p>
+    </details>
+  </div>
+</section>
+
+<section class="cta-panel reveal">
+  <div class="cta-glow" aria-hidden="true"></div>
+  <div class="cta-copy">
+    <h2>Подключитесь за минуту</h2>
+    <p>Откройте бота, получите ссылку и сканируйте QR. Без регистрации и оплаты.</p>
+  </div>
+  <div class="cta-actions">
+    {% if bot_url %}
+    <a class="btn btn--light btn--lg" href="{{ bot_url }}" target="_blank" rel="noopener">
+      <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+      Открыть @{{ bot_username }}
+    </a>
+    {% endif %}
+    <a class="btn btn--outline-light btn--lg" href="{{ channel_url }}" target="_blank" rel="noopener">
+      Telegram-канал
+      <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

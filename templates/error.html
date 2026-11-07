@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ title }} | LiVPN{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block nav %}
+  <a href="/">Главная</a>
+  {% if channel_url %}<a href="{{ channel_url }}" target="_blank" rel="noopener">Канал</a>{% endif %}
+{% endblock %}
+{% block content %}
+<section class="error-page">
+  <div class="error-orb" aria-hidden="true"></div>
+  <div class="error-card reveal">
+    <span class="error-code">{{ code }}</span>
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+    <div class="error-actions">
+      <a class="btn btn--primary" href="/">
+        <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg>
+        На главную
+      </a>
+      {% if bot_url %}
+      <a class="btn btn--ghost" href="{{ bot_url }}" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg>
+        Открыть бота
+      </a>
+      {% endif %}
+      {% if support_url %}
+      <a class="btn btn--ghost" href="{{ support_url }}" target="_blank" rel="noopener">Поддержка</a>
+      {% endif %}
+    </div>
+    <p class="error-hint">Код ответа {{ code }}. Если это неожиданно — обновите страницу или получите новую ссылку в боте.</p>
+  </div>
+</section>
+{% endblock %}

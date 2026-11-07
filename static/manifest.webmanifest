@@ -1,0 +1,47 @@
+{
+  "name": "LiVPN — подписки Xray",
+  "short_name": "LiVPN",
+  "description": "Бесплатные подписки Xray для Happ, Incy, v2rayNG и Hiddify: девять стран, три транспорта, QR-коды и автообновление.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/static/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Моя подписка",
+      "short_name": "Кабинет",
+      "description": "Открыть кабинет подписки",
+      "url": "/#cabinet",
+      "icons": [{ "src": "/static/logo.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
