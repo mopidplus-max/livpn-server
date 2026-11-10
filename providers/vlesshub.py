@@ -1,7 +1,13 @@
-"""VLESSHub provider: fetches the subscription attached to account.json."""
+"""VLESSHub provider: у каждой подписки LiVPN свой аккаунт VLESSHub.
+
+Общий account.json давал всем пользователям один и тот же трафик, поэтому
+аккаунт создаётся отдельно для каждой подписки: /data/accounts/<токен>.json.
+Когда пробный тариф заканчивается, аккаунт пересоздаётся автоматически.
+"""
 from __future__ import annotations
 
 import logging
+import time
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
@@ -23,22 +29,21 @@ def _safe_url(url: str) -> str:
         return "<url>"
 
 
-class VlessHubProvider:
-    key = "vlesshub"
+def _account_for(sub):
+    """Файл аккаунта именно этой подписки."""
+    token = ""
+    try:
+        token = str(sub["token"] or "")
+    except (KeyError, IndexError, TypeError):
+        token = ""
+    if not token:
+        raise ProviderError("У подписки нет токена — некуда сохранить аккаунт")
+    return config.vlesshub_account_path(token)
 
-    def fetch(self, sub) -> tuple[list[Node], Traffic]:
-        try:
-            account = ensure_account()
-        except Exception as exc:
-            raise ProviderError(f"Не удалось подготовить VLESSHub: {exc}") from exc
 
-        url = (account.get("subscription_url") or "").strip()
-        if not url:
-            raise ProviderError("В account.json отсутствует subscription_url")
-        parts = urlsplit(url)
-        if parts.scheme not in ("http", "https") or not parts.netloc:
-            raise ProviderError("VLESSHub вернул некорректную ссылку подписки")
-
+def _download(url: str) -> requests.Response:
+    last: Exception | None = None
+    for attempt in (1, 2, 3):
         try:
             response = requests.get(
                 url,
@@ -50,8 +55,34 @@ class VlessHubProvider:
                 allow_redirects=True,
             )
         except requests.RequestException as exc:
-            raise ProviderError(f"VLESSHub subscription недоступна: {exc}") from exc
+            last = exc
+            log.warning(
+                "VLESSHub: попытка %s из 3 не удалась (%s)", attempt, _safe_url(url)
+            )
+            time.sleep(1.5 * attempt)
+            continue
+        return response
+    raise ProviderError(f"VLESSHub subscription недоступна: {last}")
 
+
+class VlessHubProvider:
+    key = "vlesshub"
+
+    def fetch(self, sub) -> tuple[list[Node], Traffic]:
+        path = _account_for(sub)
+        try:
+            account = ensure_account(path)
+        except Exception as exc:
+            raise ProviderError(f"Не удалось подготовить VLESSHub: {exc}") from exc
+
+        url = (account.get("subscription_url") or "").strip()
+        if not url:
+            raise ProviderError(f"В {path.name} отсутствует subscription_url")
+        parts = urlsplit(url)
+        if parts.scheme not in ("http", "https") or not parts.netloc:
+            raise ProviderError("VLESSHub вернул некорректную ссылку подписки")
+
+        response = _download(url)
         if not response.ok:
             raise ProviderError(
                 f"VLESSHub subscription вернула HTTP {response.status_code} "

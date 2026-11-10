@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
     BASE_URL_FILE=/data/base_url.txt \
     BOT_USERNAME_FILE=/data/bot_username.txt \
     VLESSHUB_ACCOUNT_FILE=/data/account.json \
+    VLESSHUB_ACCOUNTS_DIR=/data/accounts \
     NODES_FILE=/data/nodes.json
 
 WORKDIR /app

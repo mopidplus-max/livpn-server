@@ -134,11 +134,18 @@ UPSTREAM_URL = _env("UPSTREAM_URL")
 UPSTREAM_USER_AGENT = _env("UPSTREAM_USER_AGENT", "Happ/3.0 (Android)")
 HTTP_TIMEOUT = _env_int("HTTP_TIMEOUT", 30)
 
-# vlesshub — единый аккаунт VLESSHub для источника узлов LiVPN.
-# Первый запуск создаёт аккаунт mail.tm и активирует доступный пробный тариф.
+# vlesshub — аккаунты VLESSHub. У каждой подписки LiVPN свой аккаунт,
+# иначе трафик у всех пользователей был бы одинаковым (один upstream-аккаунт).
 VLESSHUB_API_URL = _env("VLESSHUB_API_URL", "https://vlesshub.fun/api").rstrip("/")
 VLESSHUB_ACCOUNT_FILE = Path(
     _env("VLESSHUB_ACCOUNT_FILE", str(BASE_DIR / "account.json"))
+)
+# Каталог персональных аккаунтов: <токен подписки>.json
+VLESSHUB_ACCOUNTS_DIR = Path(
+    _env(
+        "VLESSHUB_ACCOUNTS_DIR",
+        str(VLESSHUB_ACCOUNT_FILE.parent / "accounts"),
+    )
 )
 
 XUI_BASE_URL = _env("XUI_BASE_URL").rstrip("/")
@@ -536,6 +543,15 @@ def base_url() -> str:
 
 def sub_url(token: str) -> str:
     return f"{base_url()}/sub/{token}"
+
+
+_ACCOUNT_TOKEN_RE = re.compile(r"[^A-Za-z0-9_-]+")
+
+
+def vlesshub_account_path(token: str) -> Path:
+    """Файл персонального аккаунта VLESSHub для подписки с этим токеном."""
+    safe = _ACCOUNT_TOKEN_RE.sub("", token or "")[:64] or "shared"
+    return VLESSHUB_ACCOUNTS_DIR / f"{safe}.json"
 
 
 # ── Ссылки для веба ──────────────────────────────────────────────────────────
